@@ -1,0 +1,31 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: delivery-tracker-api
+  description: Real-time delivery tracking service — following flavor all the way to your door
+  annotations:
+    github.com/project-slug: portal-interview/delivery-tracker-api
+    backstage.io/techdocs-ref: dir:.
+  links:
+    - url: https://github.com/portal-interview/delivery-tracker-api
+      title: GitHub
+spec:
+  type: service
+  lifecycle: production
+  owner: group:portal-interview/team-grill
+  system: delivery-tracker
+  providesApis:
+    - delivery-tracker-api
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: delivery-tracker-api
+  description: Real-time delivery tracking API
+spec:
+  type: openapi
+  lifecycle: production
+  owner: group:portal-interview/team-grill
+  system: delivery-tracker
+  definition:
+    $text: ./openapi.yaml

@@ -1,0 +1,147 @@
+openapi: 3.0.3
+info:
+  title: Delivery Tracker API
+  description: Real-time delivery tracking — following flavor all the way to your door
+  version: 1.0.0
+servers:
+  - url: https://delivery-tracker.flavortown.internal
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: Healthy
+  /deliveries:
+    get:
+      summary: List active deliveries
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [assigned, picked_up, in_transit, delivered]
+        - name: driverId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Active deliveries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Delivery'
+  /deliveries/{deliveryId}:
+    get:
+      summary: Get delivery status
+      parameters:
+        - name: deliveryId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Delivery details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Delivery'
+  /deliveries/{deliveryId}/location:
+    put:
+      summary: Update driver location
+      parameters:
+        - name: deliveryId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationUpdate'
+      responses:
+        '200':
+          description: Location updated
+  /deliveries/{deliveryId}/eta:
+    get:
+      summary: Get estimated time of arrival
+      parameters:
+        - name: deliveryId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ETA information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ETA'
+components:
+  schemas:
+    Delivery:
+      type: object
+      properties:
+        id:
+          type: string
+        orderId:
+          type: string
+        driverId:
+          type: string
+        status:
+          type: string
+          enum: [assigned, picked_up, in_transit, delivered]
+        pickupLocation:
+          $ref: '#/components/schemas/Location'
+        dropoffLocation:
+          $ref: '#/components/schemas/Location'
+        currentLocation:
+          $ref: '#/components/schemas/Location'
+        createdAt:
+          type: string
+          format: date-time
+    Location:
+      type: object
+      properties:
+        lat:
+          type: number
+          format: double
+          example: 37.7749
+        lng:
+          type: number
+          format: double
+          example: -122.4194
+        address:
+          type: string
+    LocationUpdate:
+      type: object
+      properties:
+        lat:
+          type: number
+          format: double
+        lng:
+          type: number
+          format: double
+        heading:
+          type: number
+        speed:
+          type: number
+    ETA:
+      type: object
+      properties:
+        estimatedArrival:
+          type: string
+          format: date-time
+        distanceRemaining:
+          type: number
+          description: Distance in miles
+        durationRemaining:
+          type: integer
+          description: Duration in seconds
